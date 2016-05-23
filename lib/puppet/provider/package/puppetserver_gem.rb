@@ -2,7 +2,7 @@ require 'puppet/provider/package'
 require 'uri'
 
 # Ruby gems support.
-Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
+Puppet::Type.type(:package).provide :puppetagent_gem, :parent => :gem do
   desc "Puppet Server Ruby Gem support. If a URL is passed via `source`, then
     that URL is used as the remote gem repository; if a source is present but is
     not a valid URL, it will be interpreted as the path to a local gem file.  If
@@ -11,10 +11,10 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
   has_feature :versionable, :install_options, :uninstall_options
 
-  commands :puppetservercmd => "/opt/puppetlabs/bin/puppetserver" 
+  commands :puppetagentcmd => "/opt/puppetlabs/puppet/bin/gem"
 
   def self.gemlist(options)
-    gem_list_command = [command(:puppetservercmd), "gem", "list"]
+    gem_list_command = [command(:puppetagentcmd), "list"]
 
     if options[:local]
       gem_list_command << "--local"
@@ -44,7 +44,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   end
 
   def install(useversion = true)
-    command = [command(:puppetservercmd), "gem", "install"]
+    command = [command(:puppetagentcmd), "install"]
     command << "-v" << resource[:ensure] if (! resource[:ensure].is_a? Symbol) and useversion
 
     if source = resource[:source]
@@ -79,7 +79,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   end
 
   def uninstall
-    command = [command(:puppetservercmd), "gem", "uninstall"]
+    command = [command(:puppetagentcmd), "uninstall"]
     command << "-x" << "-a" << resource[:name]
 
     output = execute(command)
